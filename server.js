@@ -1,26 +1,19 @@
 const express = require("express");
-const dotenv = require("dotenv");
-const mysql = require("mysql");
+
+const bodyParser = require("body-parser");
+
+const signup = require("./src/routes/signup");
 const app = express();
 
-// Config dotenv to get access to the variables
-dotenv.config();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
-const connection = mysql.createConnection({
-  host: process.env.HOST,
-  port: process.env.PORT,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-});
-
-connection.connect((err) => {
-  if (err) return console.log(err);
-  console.log("conectou!");
-});
-
+// Start the server
 app.get("/", function (req, res) {
   res.send("Hello World!");
 });
+
+app.use("/signup", signup);
 
 app.listen(3000, function () {
   console.log("Example app listening on port 3000!");
