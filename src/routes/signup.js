@@ -1,15 +1,14 @@
 const database = require("../database");
 const express = require("express");
+const { createUser } = require("../models/user");
 const router = express.Router();
 
-const ERROR_MESSAGES = {
-  "1062": "Duplicate entry 'jose.casemiro@gmail.com' for key email",
-};
-
+// Set the databse conection to use the user DB
 database.query("USE user", (err, result) => {
   if (err) throw err;
 });
 
+// Try to create a new user in the database, if email allreay reponse a error code
 router.post("/", (request, res) => {
   try {
     const { name, surname, email, password } = request.body;
@@ -19,11 +18,11 @@ router.post("/", (request, res) => {
     if (!isValid) res.sendStatus(400);
 
     try {
-      const query = database.query(
-        `INSERT INTO users (name, surname, email, password) VALUES ('${name}', '${surname}', '${email}', '${password}')`
-      );
+      const query = createUser({ name, surname, email, password });
 
-      query.on("error", () => res.sendStatus(400));
+      query.on("error", (err) => {
+        res.status(401).json({ msg: "Email ja cadastrado!" });
+      });
 
       query.on("result", () => res.sendStatus(200));
     } catch (error) {
