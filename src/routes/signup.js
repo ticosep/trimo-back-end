@@ -1,4 +1,4 @@
-const database = require("../database");
+const { database } = require("../database");
 const express = require("express");
 const { createUser } = require("../models/user");
 const router = express.Router();

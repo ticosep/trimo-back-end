@@ -1,6 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const { signup, login } = require("./src/routes");
+const { signup, login, farm } = require("./src/routes");
 const { passport, STRATEGYS } = require("./src/passportAuth");
 
 const app = express();
@@ -18,6 +18,8 @@ app.get("/", function (req, res) {
 app.use("/signup", signup);
 
 app.use("/login", login);
+
+app.use("/farm", farm);
 
 app.get(
   "/protected",

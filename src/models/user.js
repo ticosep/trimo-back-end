@@ -1,4 +1,4 @@
-const database = require("../database");
+const { database } = require("../database");
 
 const createUser = ({ name, surname, email, password }) => {
   return database.query(
