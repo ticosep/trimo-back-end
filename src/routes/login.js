@@ -1,4 +1,5 @@
 const express = require("express");
+const { query } = require("../database");
 const router = express.Router();
 const { jwtOptions, jwt } = require("../passportAuth");
 
@@ -18,12 +19,14 @@ const handleLogin = (user, password, res) => {
 };
 
 // Try to create a new user in the database, if email allreay reponse a error code
-router.post("/", (request, res) => {
+router.post("/", async (request, res) => {
   const { email, password } = request.body;
 
   const isValid = !!email && !!password;
 
   if (!isValid) res.sendStatus(400);
+
+  await query("USE user");
 
   try {
     getUserByEmail({ email }, (error, result) => {
@@ -31,6 +34,8 @@ router.post("/", (request, res) => {
 
       if (!result.length) {
         res.status(401).json({ msg: "Usuario nao cadastrado" });
+
+        return;
       }
 
       const user = result[0];
