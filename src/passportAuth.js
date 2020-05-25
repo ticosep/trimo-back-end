@@ -2,6 +2,11 @@ const passport = require("passport");
 const passportJWT = require("passport-jwt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const { getUserById } = require("./models/user");
+
+const STRATEGYS = {
+  USER: "user-rule",
+};
 
 // Config dotenv to get access to the variables
 dotenv.config();
@@ -16,17 +21,19 @@ jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = process.env.PASSPORT_KEY;
 
 // lets create our strategy for web token
-let strategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
-  console.log("payload received", jwt_payload);
-  let user = getUser({ id: jwt_payload.id });
-  if (user) {
-    next(null, user);
-  } else {
-    next(null, false);
-  }
+let userStrategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
+  getUserById({ id: jwt_payload.id }, (error, user) => {
+    if (error) next(null, false);
+
+    if (user) {
+      next(null, user);
+    } else {
+      next(null, false);
+    }
+  });
 });
 
 // use the strategy
-passport.use(strategy);
+passport.use(STRATEGYS.USER, userStrategy);
 
-module.exports = { passport, jwtOptions, jwt };
+module.exports = { passport, STRATEGYS, jwtOptions, jwt };

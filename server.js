@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { signup, login } = require("./src/routes");
-const { passport } = require("./src/passportAuth");
+const { passport, STRATEGYS } = require("./src/passportAuth");
 
 const app = express();
 
@@ -18,6 +18,14 @@ app.get("/", function (req, res) {
 app.use("/signup", signup);
 
 app.use("/login", login);
+
+app.get(
+  "/protected",
+  passport.authenticate(STRATEGYS.USER, { session: false }),
+  (req, res) => {
+    res.json("Success! You can now see this without a token.");
+  }
+);
 
 app.listen(3000, function () {
   console.log("Example app listening on port 3000!");

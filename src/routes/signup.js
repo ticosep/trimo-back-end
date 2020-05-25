@@ -33,15 +33,4 @@ router.post("/", (request, res) => {
   }
 });
 
-router.get("/", (request, res) => {
-  try {
-    database.query("SELECT * FROM users", (err, result) => {
-      if (err) throw err;
-      res.send(result);
-    });
-  } catch (error) {
-    res.sendStatus(404);
-  }
-});
-
 module.exports = router;

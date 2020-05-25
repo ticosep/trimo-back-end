@@ -6,11 +6,18 @@ const createUser = ({ name, surname, email, password }) => {
   );
 };
 
-const getUser = ({ email }, callback) => {
+const getUserByEmail = ({ email }, callback) => {
   return database.query(
     `SELECT * FROM users WHERE email = '${email}'`,
     callback
   );
 };
 
-module.exports = { createUser, getUser };
+const getUserById = ({ id }, callback) => {
+  return database.query(
+    `SELECT * FROM users WHERE idusers = '${id}'`,
+    callback
+  );
+};
+
+module.exports = { createUser, getUserByEmail, getUserById };
