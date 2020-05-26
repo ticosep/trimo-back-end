@@ -21,6 +21,7 @@ jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = process.env.PASSPORT_KEY;
 
 // lets create our strategy for web token
+// TODO: Add falg to use worker validation
 let userStrategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
   getUserById({ id: jwt_payload.id }, (error, user) => {
     if (error) next(null, false);
