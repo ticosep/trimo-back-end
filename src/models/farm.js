@@ -8,12 +8,12 @@ const getNewFarmDatabaseSQL = (farmId) => {
     type int(11) NOT NULL,
     name varchar(100) NOT NULL,
     surname varchar(100) NOT NULL,
-    appkey varchar(100) NOT NULL,
+    appkey varchar(100) NULL,
     PRIMARY KEY (id)
   );
   CREATE TABLE reports (
     id int(11) NOT NULL auto_increment,
-    plague_id int(11) NOT NULL,
+    tag_id int(11) NOT NULL,
     group_id int(11) NOT NULL,
     worker_id int(11) NOT NULL,
     latidute int(11) NOT NULL,
@@ -21,17 +21,17 @@ const getNewFarmDatabaseSQL = (farmId) => {
     accuracy int(11) NOT NULL,
     PRIMARY KEY (id)
   );
-  CREATE TABLE plage_groups (
+  CREATE TABLE tag_groups (
     id int(11) NOT NULL auto_increment,
     name varchar(100) NOT NULL,
     PRIMARY KEY (id)
   );
-  CREATE TABLE plages (
+  CREATE TABLE tags (
     id int(11) NOT NULL auto_increment,
-    group_id int(11) NOT NULL,
+    tag_group_id int(11) NOT NULL,
     name varchar(100) NOT NULL,
     color varchar(100) NOT NULL,
-    plague_desc varchar(100) NOT NULL,
+    tag_desc varchar(100) NOT NULL,
     PRIMARY KEY (id)
   );
   `;
