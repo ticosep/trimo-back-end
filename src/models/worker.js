@@ -9,7 +9,7 @@ const createWorker = async ({ farm_id, type, name, surname }, res) => {
       `INSERT INTO workers (type, name, surname) VALUES (${type}, '${name}', '${surname}')`
     );
 
-    const appcode = getAppCode(farm_id, insertId, type);
+    const appcode = getAppCode(farm_id, insertId);
 
     await query(
       `UPDATE workers SET appkey = '${appcode}' WHERE id = ${insertId}`

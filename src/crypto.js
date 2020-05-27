@@ -4,11 +4,8 @@ const dotenv = require("dotenv");
 // Config dotenv to get access to the variables
 dotenv.config();
 
-const getAppCode = (farm_id, user_id, user_type) => {
-  const code = AES.encrypt(
-    `${farm_id}/${user_id}/${user_type}`,
-    process.env.AES_PASS
-  );
+const getAppCode = (farm_id, user_id) => {
+  const code = AES.encrypt(`${farm_id}/${user_id}`, process.env.AES_PASS);
 
   return code;
 };

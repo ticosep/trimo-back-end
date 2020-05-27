@@ -22,14 +22,15 @@ router.post(
   "/create",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   (request, res) => {
-    const { name, production, user_id } = request.body;
+    const { name, production, user_id, user_name, user_surname } = request.body;
 
-    const isValid = !!name && !!production && user_id;
+    const isValid =
+      !!name && !!production && !!user_id && !!user_name && !!user_surname;
 
     if (!isValid) res.sendStatus(400);
 
     try {
-      createFarm({ name, production, user_id }, res);
+      createFarm({ name, production, user_id, user_name, user_surname }, res);
     } catch (error) {
       res.status(404).json({ error });
     }

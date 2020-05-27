@@ -1,6 +1,6 @@
 const { query } = require("../database");
 
-const getNewFarmDatabaseSQL = (farmId) => {
+const getNewFarmDatabaseSQL = (farmId, user_name, user_surname, user_id) => {
   return `CREATE DATABASE farm_${farmId};
   USE farm_${farmId};
   CREATE TABLE workers (
@@ -9,6 +9,13 @@ const getNewFarmDatabaseSQL = (farmId) => {
     name varchar(100) NOT NULL,
     surname varchar(100) NOT NULL,
     appkey varchar(100) NULL,
+    PRIMARY KEY (id)
+  );
+  CREATE TABLE owners (
+    id int(11) NOT NULL auto_increment,
+    app_id int(11) NOT NULL,
+    name varchar(100) NOT NULL,
+    surname varchar(100) NOT NULL,
     PRIMARY KEY (id)
   );
   CREATE TABLE reports (
@@ -34,10 +41,15 @@ const getNewFarmDatabaseSQL = (farmId) => {
     tag_desc varchar(100) NOT NULL,
     PRIMARY KEY (id)
   );
+
+  INSERT INTO owners (app_id, name, surname) VALUES (${user_id}, '${user_name}', '${user_surname}');
   `;
 };
 
-const createFarm = async ({ name, production, user_id }, res) => {
+const createFarm = async (
+  { name, production, user_id, user_name, user_surname },
+  res
+) => {
   try {
     const { insertId } = await query(
       `INSERT INTO farms (name, production) VALUES ('${name}', '${production}')`
@@ -47,7 +59,12 @@ const createFarm = async ({ name, production, user_id }, res) => {
       `INSERT INTO farm_users (farm, user_id) VALUES ('${insertId}', '${user_id}')`
     );
 
-    const SQL = getNewFarmDatabaseSQL(insertId);
+    const SQL = getNewFarmDatabaseSQL(
+      insertId,
+      user_name,
+      user_surname,
+      user_id
+    );
 
     await query(SQL);
 

@@ -9,7 +9,7 @@ const handleLogin = (user, password, res) => {
   if (user.password === password) {
     // from now on we’ll identify the user by the id and the id is
     // the only personalized value that goes into our token
-    let payload = { id: user.idusers };
+    let payload = { id: user.idusers, is_worker: false };
 
     let token = jwt.sign(payload, jwtOptions.secretOrKey);
     res.json({ msg: "ok", token: token });
@@ -18,7 +18,6 @@ const handleLogin = (user, password, res) => {
   }
 };
 
-// Try to create a new user in the database, if email allreay reponse a error code
 router.post("/", async (request, res) => {
   const { email, password } = request.body;
 
