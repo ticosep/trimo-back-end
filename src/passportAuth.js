@@ -23,21 +23,31 @@ jwtOptions.secretOrKey = process.env.PASSPORT_KEY;
 // lets create our strategy for web token
 let userStrategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
   if (!jwt_payload.is_worker) {
-    getUserById({ id: jwt_payload.id }, (error, user) => {
-      if (error) next(null, false);
+    if (user) {
+      const appUser = {
+        id: jwt_payload.id,
+        is_worker: false,
+        can_create_worker: true,
+      };
 
-      if (user) {
-        const appUser = {
-          id: jwt_payload.id,
-          is_worker: false,
-          can_create_worker: true,
-        };
+      next(null, appUser);
+    } else {
+      next(null, false);
+    }
+  }
 
-        next(null, appUser);
-      } else {
-        next(null, false);
-      }
-    });
+  if (jwt_payload.is_worker) {
+    if (user) {
+      const appUser = {
+        id: jwt_payload.id,
+        is_worker: true,
+        can_create_worker: !!user.type,
+      };
+
+      next(null, appUser);
+    } else {
+      next(null, false);
+    }
   }
 });
 

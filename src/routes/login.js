@@ -2,6 +2,7 @@ const express = require("express");
 const { query } = require("../database");
 const router = express.Router();
 const { jwtOptions, jwt } = require("../passportAuth");
+const { decodeAppCode } = require("../crypto");
 
 const { getUserByEmail } = require("../models/user");
 
@@ -9,7 +10,7 @@ const handleLogin = (user, password, res) => {
   if (user.password === password) {
     // from now on we’ll identify the user by the id and the id is
     // the only personalized value that goes into our token
-    let payload = { id: user.idusers, is_worker: false };
+    let payload = { user: user, is_worker: false };
 
     let token = jwt.sign(payload, jwtOptions.secretOrKey);
     res.json({ msg: "ok", token: token });
@@ -18,18 +19,32 @@ const handleLogin = (user, password, res) => {
   }
 };
 
+const handleCodeLogin = (user, res) => {
+  let payload = { user: user, is_worker: true };
+
+  let token = jwt.sign(payload, jwtOptions.secretOrKey);
+  res.json({ msg: "ok", token: token });
+};
+
 router.post("/", async (request, res) => {
   const { email, password } = request.body;
 
   const isValid = !!email && !!password;
 
-  if (!isValid) res.sendStatus(400);
+  if (!isValid) {
+    res.sendStatus(400);
+    return;
+  }
 
   await query("USE user");
 
   try {
     getUserByEmail({ email }, (error, result) => {
-      if (error) res.status(401).json({ error });
+      if (error) {
+        res.status(401).json({ error });
+
+        return;
+      }
 
       if (!result.length) {
         res.status(401).json({ msg: "Usuario nao cadastrado" });
@@ -42,6 +57,29 @@ router.post("/", async (request, res) => {
     });
   } catch (error) {
     res.status(404).json({ error });
+    return;
+  }
+});
+
+router.post("/code", async (request, res) => {
+  const { appkey } = request.body;
+
+  const isValid = !!appkey;
+
+  if (!isValid) res.sendStatus(400);
+
+  const info = decodeAppCode(appkey);
+  const [farm_id, user_id] = info.split("/");
+
+  try {
+    await query(`USE farm_${farm_id}`);
+
+    const user = query(`SELECT * FROM workers WHERE id = ${user_id}`);
+
+    handleCodeLogin(user, res);
+  } catch (error) {
+    res.status(404).json({ error });
+    return;
   }
 });
 
