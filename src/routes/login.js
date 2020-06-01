@@ -19,8 +19,8 @@ const handleLogin = (user, password, res) => {
   }
 };
 
-const handleCodeLogin = (user, farm_id, res) => {
-  let payload = { user: user, is_worker: true, farm_id: +farm_id };
+const handleCodeLogin = (farm_id, user_id, res) => {
+  let payload = { id: +user_id, is_worker: true, farm_id: +farm_id };
 
   let token = jwt.sign(payload, jwtOptions.secretOrKey);
   res.json({ msg: "ok", token: token });
@@ -75,11 +75,8 @@ router.post("/code", async (request, res) => {
   const [farm_id, user_id] = info.split("/");
 
   try {
-    await query(`USE farm_${farm_id}`);
-
-    const user = query(`SELECT * FROM workers WHERE id = ${user_id}`);
-
-    handleCodeLogin(user, farm_id, res);
+    handleCodeLogin(farm_id, user_id, res);
+    return;
   } catch (error) {
     res.status(404).json({ error });
     return;

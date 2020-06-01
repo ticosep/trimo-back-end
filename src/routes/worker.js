@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { passport, STRATEGYS } = require("../passportAuth");
 const { createWorker, editWorker, deleteWorker } = require("../models/worker");
-const { validateFarmOperation } = require("../models/farm");
 
 // Create a new worker under the farm id
 router.post(
@@ -10,12 +9,9 @@ router.post(
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
     const { farm_id, name, surname, type } = request.body;
-    const { can_create_worker } = request.user;
+    const { can_create_worker, farms } = request.user;
 
-    const hasAccessToFarm = await validateFarmOperation({
-      farm_id,
-      user: request.user,
-    });
+    const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
     const isValid =
       !!name && !!farm_id && !!surname && can_create_worker && hasAccessToFarm;
@@ -39,12 +35,9 @@ router.post(
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
     const { farm_id, worker_id, type, name, surname } = request.body;
-    const { can_create_worker } = request.user;
+    const { can_create_worker, farms } = request.user;
 
-    const hasAccessToFarm = await validateFarmOperation({
-      farm_id,
-      user: request.user,
-    });
+    const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
     const isValid =
       !!name && !!surname && !!type && can_create_worker && hasAccessToFarm;
@@ -67,12 +60,9 @@ router.post(
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
     const { farm_id, worker_id } = request.body;
-    const { can_create_worker } = request.user;
+    const { can_create_worker, farms } = request.user;
 
-    const hasAccessToFarm = await validateFarmOperation({
-      farm_id,
-      user: request.user,
-    });
+    const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
     const isValid = can_create_worker && hasAccessToFarm;
 
