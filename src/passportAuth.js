@@ -2,7 +2,6 @@ const passport = require("passport");
 const passportJWT = require("passport-jwt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-const { getUserById } = require("./models/user");
 
 const STRATEGYS = {
   USER: "user-rule",
@@ -21,33 +20,27 @@ jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
 jwtOptions.secretOrKey = process.env.PASSPORT_KEY;
 
 // lets create our strategy for web token
-let userStrategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
+let userStrategy = new JwtStrategy(jwtOptions, async (jwt_payload, next) => {
   if (!jwt_payload.is_worker) {
-    if (user) {
-      const appUser = {
-        id: jwt_payload.id,
-        is_worker: false,
-        can_create_worker: true,
-      };
+    const appUser = {
+      id: jwt_payload.user.id,
+      is_worker: false,
+      is_owner: true,
+      can_create_worker: true,
+    };
 
-      next(null, appUser);
-    } else {
-      next(null, false);
-    }
+    next(null, appUser);
   }
 
   if (jwt_payload.is_worker) {
-    if (user) {
-      const appUser = {
-        id: jwt_payload.id,
-        is_worker: true,
-        can_create_worker: !!user.type,
-      };
+    const appUser = {
+      id: jwt_payload.id,
+      is_worker: true,
+      can_create_worker: !!user.type,
+      farm_id: jwt_payload.farm_id,
+    };
 
-      next(null, appUser);
-    } else {
-      next(null, false);
-    }
+    next(null, appUser);
   }
 });
 

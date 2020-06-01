@@ -19,8 +19,8 @@ const handleLogin = (user, password, res) => {
   }
 };
 
-const handleCodeLogin = (user, res) => {
-  let payload = { user: user, is_worker: true };
+const handleCodeLogin = (user, farm_id, res) => {
+  let payload = { user: user, is_worker: true, farm_id: +farm_id };
 
   let token = jwt.sign(payload, jwtOptions.secretOrKey);
   res.json({ msg: "ok", token: token });
@@ -53,7 +53,10 @@ router.post("/", async (request, res) => {
       }
 
       const user = result[0];
+
       handleLogin(user, password, res);
+
+      return;
     });
   } catch (error) {
     res.status(404).json({ error });
@@ -76,7 +79,7 @@ router.post("/code", async (request, res) => {
 
     const user = query(`SELECT * FROM workers WHERE id = ${user_id}`);
 
-    handleCodeLogin(user, res);
+    handleCodeLogin(user, farm_id, res);
   } catch (error) {
     res.status(404).json({ error });
     return;

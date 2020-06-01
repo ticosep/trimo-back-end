@@ -16,9 +16,41 @@ const createWorker = async ({ farm_id, type, name, surname }, res) => {
     );
 
     res.sendStatus(200);
+    return;
   } catch (error) {
     res.status(401).json({ error });
+    return;
   }
 };
 
-module.exports = { createWorker };
+const editWorker = async ({ farm_id, worker_id, type, name, surname }, res) => {
+  try {
+    await query(`USE farm_${farm_id}`);
+
+    await query(
+      `UPDATE workers SET name = '${name}', surname = '${surname}', type = ${+type} WHERE id = ${worker_id}`
+    );
+
+    res.sendStatus(200);
+    return;
+  } catch (error) {
+    res.status(401).json({ error });
+    return;
+  }
+};
+
+const deleteWorker = async ({ farm_id, worker_id }, res) => {
+  try {
+    await query(`USE farm_${farm_id}`);
+
+    await query(`DELETE FROM workers WHERE id = ${worker_id}`);
+
+    res.sendStatus(200);
+    return;
+  } catch (error) {
+    res.status(401).json({ error });
+    return;
+  }
+};
+
+module.exports = { createWorker, editWorker, deleteWorker };

@@ -74,4 +74,27 @@ const createFarm = async (
   }
 };
 
-module.exports = { createFarm };
+const validateFarmOperation = async ({ farm_id, user }) => {
+  const { is_worker } = user;
+
+  if (is_worker) {
+    return +farm_id === +user.farm_id;
+  }
+
+  if (!is_worker) {
+    try {
+      await query("USE user");
+
+      const userFarms = await query(
+        `SELECT farm FROM farm_users WHERE user_id = ${+user.id}`
+      );
+
+      return userFarms.some(({ farm }) => +farm === +farm_id);
+    } catch (error) {
+      console.log(error);
+      return false;
+    }
+  }
+};
+
+module.exports = { createFarm, validateFarmOperation };
