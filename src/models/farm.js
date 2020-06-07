@@ -21,11 +21,11 @@ const getNewFarmDatabaseSQL = (farmId, user_name, user_surname, user_id) => {
   CREATE TABLE reports (
     id int(11) NOT NULL auto_increment,
     tag_id int(11) NOT NULL,
-    group_id int(11) NOT NULL,
     worker_id int(11) NOT NULL,
     latidute int(11) NOT NULL,
     longitude int(11) NOT NULL,
     accuracy int(11) NOT NULL,
+    timestamp int(11) NOT NULL,
     PRIMARY KEY (id)
   );
   CREATE TABLE tag_groups (
@@ -39,6 +39,7 @@ const getNewFarmDatabaseSQL = (farmId, user_name, user_surname, user_id) => {
     name varchar(100) NOT NULL,
     color varchar(100) NOT NULL,
     tag_desc varchar(100) NOT NULL,
+    custom_data varchar(100) NULL,
     PRIMARY KEY (id)
   );
 
@@ -69,9 +70,41 @@ const createFarm = async (
     await query(SQL);
 
     res.sendStatus(200);
+    return;
   } catch (error) {
     res.status(401).json({ error });
+    return;
   }
 };
 
-module.exports = { createFarm };
+const setMapFeatures = async ({ farm_id, map_features }, res) => {
+  try {
+    await query("USE user");
+
+    await query(
+      `UPDATE map_features SET map_features = '${map_features}' WHERE id = ${+farm_id}`
+    );
+
+    res.sendStatus(200);
+    return;
+  } catch (error) {
+    res.status(401).json({ error });
+    return;
+  }
+};
+
+const getMapFeatures = async ({ farm_id }, res) => {
+  try {
+    await query("USE user");
+
+    const features = await query(`SELECT map_features WHERE id = ${farm_id}`);
+
+    res.status(200).json({ features });
+    return;
+  } catch (error) {
+    res.status(401).json({ error });
+    return;
+  }
+};
+
+module.exports = { createFarm, getMapFeatures, setMapFeatures };

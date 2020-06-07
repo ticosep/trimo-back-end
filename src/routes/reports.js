@@ -1,22 +1,58 @@
 const express = require("express");
 const router = express.Router();
 const { passport, STRATEGYS } = require("../passportAuth");
+const { createReport, deleteReport, getReports } = require("../models/report");
 
-const {
-  createFarm,
-  getMapFeatures,
-  setMapFeatures,
-} = require("../models/farm");
+router.get(
+  "/:farm_id",
+  passport.authenticate(STRATEGYS.USER, { session: false }),
+  async (request, res) => {
+    const farm_id = request.params.farm_id;
+    const { farms } = request.user;
 
-// Create a new farm
+    const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
+
+    const isValid = hasAccessToFarm;
+
+    if (!isValid) {
+      res.sendStatus(400);
+      return;
+    }
+
+    try {
+      await getReports({ farm_id }, res);
+      return;
+    } catch (error) {
+      res.status(404).json({ error });
+      return;
+    }
+  }
+);
+
 router.post(
   "/create",
   passport.authenticate(STRATEGYS.USER, { session: false }),
-  (request, res) => {
-    const { name, production, user_id, user_name, user_surname } = request.body;
+  async (request, res) => {
+    const {
+      farm_id,
+      tag_id,
+      worker_id,
+      latidute,
+      longitude,
+      accuracy,
+    } = request.body;
+    const { can_create_tags, farms } = request.user;
+
+    const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
     const isValid =
-      !!name && !!production && !!user_id && !!user_name && !!user_surname;
+      !!farm_id &&
+      !!tag_id &&
+      !!worker_id &&
+      !!latidute &&
+      !!longitude &&
+      !!accuracy &&
+      hasAccessToFarm;
 
     if (!isValid) {
       res.sendStatus(400);
@@ -24,8 +60,10 @@ router.post(
     }
 
     try {
-      createFarm({ name, production, user_id, user_name, user_surname }, res);
-      return;
+      createReport(
+        { farm_id, tag_id, worker_id, latidute, longitude, accuracy },
+        res
+      );
     } catch (error) {
       res.status(404).json({ error });
       return;
@@ -33,43 +71,16 @@ router.post(
   }
 );
 
-router.put(
-  "/map/:farm_id",
-  passport.authenticate(STRATEGYS.USER, { session: false }),
-  (request, res) => {
-    const farm_id = request.params.farm_id;
-    const { farms } = request.user;
-    const { map_features } = request.body;
-
-    const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
-
-    const isValid = !!farm_id && hasAccessToFarm;
-
-    if (!isValid) {
-      res.sendStatus(400);
-      return;
-    }
-
-    try {
-      setMapFeatures({ farm_id, map_features }, res);
-      return;
-    } catch (error) {
-      res.status(404).json({ error });
-      return;
-    }
-  }
-);
-
-router.get(
-  "/map/:farm_id",
+router.delete(
+  "/remove",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
-    const id = request.params.farm_id;
+    const { farm_id, report_id } = request.body;
     const { farms } = request.user;
 
     const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
-    const isValid = !!farm_id && hasAccessToFarm;
+    const isValid = !!report_id && hasAccessToFarm && !!farm_id;
 
     if (!isValid) {
       res.sendStatus(400);
@@ -77,7 +88,7 @@ router.get(
     }
 
     try {
-      getMapFeatures({ farm_id }, res);
+      deleteReport({ farm_id, report_id }, res);
       return;
     } catch (error) {
       res.status(404).json({ error });

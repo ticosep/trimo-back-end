@@ -1,23 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const { passport, STRATEGYS } = require("../passportAuth");
-const {
-  createWorker,
-  editWorker,
-  deleteWorker,
-  getWorkers,
-} = require("../models/worker");
+const { createTag, editTag, deleteTag, getTags } = require("../models/tag");
 
 router.get(
   "/:farm_id",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
     const farm_id = request.params.farm_id;
-    const { can_create_worker, farms } = request.user;
+    const { can_create_tags, farms } = request.user;
 
     const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
-    const isValid = can_create_worker && hasAccessToFarm;
+    const isValid = can_create_tags && hasAccessToFarm;
 
     if (!isValid) {
       res.sendStatus(400);
@@ -25,7 +20,7 @@ router.get(
     }
 
     try {
-      await getWorkers({ farm_id }, res);
+      await getTags({ farm_id }, res);
       return;
     } catch (error) {
       res.status(404).json({ error });
@@ -34,18 +29,30 @@ router.get(
   }
 );
 
-// Create a new worker under the farm id
 router.post(
   "/create",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
-    const { farm_id, name, surname, type } = request.body;
-    const { can_create_worker, farms } = request.user;
+    const {
+      farm_id,
+      group_id,
+      color,
+      tag_desc,
+      custom_data,
+      name,
+    } = request.body;
+    const { can_create_tags, farms } = request.user;
 
     const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
     const isValid =
-      !!name && !!farm_id && !!surname && can_create_worker && hasAccessToFarm;
+      !!name &&
+      !!farm_id &&
+      !!group_id &&
+      !!color &&
+      !!tag_desc &&
+      can_create_tags &&
+      hasAccessToFarm;
 
     if (!isValid) {
       res.sendStatus(400);
@@ -53,7 +60,12 @@ router.post(
     }
 
     try {
-      await createWorker({ farm_id, type, name, surname }, res);
+      await createTag(
+        { farm_id, group_id, color, tag_desc, custom_data, name },
+        res
+      );
+
+      return;
     } catch (error) {
       res.status(404).json({ error });
       return;
@@ -65,13 +77,27 @@ router.put(
   "/edit",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
-    const { farm_id, worker_id, type, name, surname } = request.body;
-    const { can_create_worker, farms } = request.user;
+    const {
+      farm_id,
+      group_id,
+      tag_id,
+      color,
+      tag_desc,
+      custom_data,
+      name,
+    } = request.body;
+    const { can_create_tags, farms } = request.user;
 
     const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
     const isValid =
-      !!name && !!surname && !!type && can_create_worker && hasAccessToFarm;
+      !!name &&
+      !!farm_id &&
+      !!group_id &&
+      !!color &&
+      !!tag_desc &&
+      can_create_tags &&
+      hasAccessToFarm;
 
     if (!isValid) {
       res.sendStatus(400);
@@ -79,10 +105,15 @@ router.put(
     }
 
     try {
-      await editWorker({ farm_id, worker_id, type, name, surname }, res);
+      await editTag(
+        { farm_id, group_id, tag_id, color, tag_desc, custom_data, name },
+        res
+      );
+
       return;
     } catch (error) {
       res.status(404).json({ error });
+      return;
     }
   }
 );
@@ -91,12 +122,12 @@ router.delete(
   "/remove",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
-    const { farm_id, worker_id } = request.body;
-    const { can_create_worker, farms } = request.user;
+    const { farm_id, tag_id } = request.body;
+    const { can_create_tags, farms } = request.user;
 
     const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);
 
-    const isValid = can_create_worker && hasAccessToFarm;
+    const isValid = can_create_tags && hasAccessToFarm && !!tag_id;
 
     if (!isValid) {
       res.sendStatus(400);
@@ -104,7 +135,7 @@ router.delete(
     }
 
     try {
-      await deleteWorker({ farm_id, worker_id }, res);
+      await deleteTag({ farm_id, tag_id }, res);
       return;
     } catch (error) {
       res.status(404).json({ error });

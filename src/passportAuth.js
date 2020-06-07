@@ -40,6 +40,10 @@ let userStrategy = new JwtStrategy(jwtOptions, async (jwt_payload, next) => {
         is_owner: true,
         farms,
         can_create_worker: true,
+        can_create_tags: true,
+        name: jwt_payload.user.name,
+        surname: jwt_payload.user.surname,
+        email: jwt_payload.user.email,
       };
 
       next(null, appUser);
@@ -60,7 +64,10 @@ let userStrategy = new JwtStrategy(jwtOptions, async (jwt_payload, next) => {
         id: jwt_payload.id,
         is_worker: true,
         can_create_worker: !!user.type,
+        can_create_tags: !!user.type,
         farms: [jwt_payload.farm_id],
+        name: user.name,
+        surname: user.surname,
       };
 
       next(null, appUser);

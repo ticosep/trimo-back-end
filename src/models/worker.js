@@ -1,6 +1,20 @@
 const { query } = require("../database");
 const { getAppCode } = require("../crypto");
 
+const getWorkers = async ({ farm_id }) => {
+  try {
+    await query(`USE farm_${farm_id}`);
+
+    const workers = await query(`SELECT * FROM workers`);
+
+    res.send(200).json({ workers });
+    return;
+  } catch (error) {
+    res.status(401).json({ error });
+    return;
+  }
+};
+
 const createWorker = async ({ farm_id, type, name, surname }, res) => {
   try {
     await query(`USE farm_${farm_id}`);
@@ -53,4 +67,4 @@ const deleteWorker = async ({ farm_id, worker_id }, res) => {
   }
 };
 
-module.exports = { createWorker, editWorker, deleteWorker };
+module.exports = { createWorker, editWorker, deleteWorker, getWorkers };

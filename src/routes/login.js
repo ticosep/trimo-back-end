@@ -11,7 +11,6 @@ const handleLogin = (user, password, res) => {
     // from now on we’ll identify the user by the id and the id is
     // the only personalized value that goes into our token
     let payload = { user: user, is_worker: false };
-
     let token = jwt.sign(payload, jwtOptions.secretOrKey);
     res.json({ msg: "ok", token: token });
   } else {

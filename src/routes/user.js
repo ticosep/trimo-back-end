@@ -3,7 +3,21 @@ const router = express.Router();
 const { passport, STRATEGYS } = require("../passportAuth");
 const { query } = require("../database");
 
-router.post(
+router.get(
+  "/",
+  passport.authenticate(STRATEGYS.USER, { session: false }),
+  async (request, res) => {
+    try {
+      res.status(200).json({ user: request.user });
+      return;
+    } catch (error) {
+      res.status(404).json({ error });
+      return;
+    }
+  }
+);
+
+router.put(
   "/edit",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
