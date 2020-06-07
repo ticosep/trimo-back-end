@@ -1,12 +1,12 @@
 const { query } = require("../database");
 
-const getReports = async ({ farm_id }) => {
+const getReports = async ({ farm_id }, res) => {
   try {
     await query(`USE farm_${farm_id}`);
 
     const reports = await query(`SELECT * FROM reports`);
 
-    res.send(200).json({ reports });
+    res.json({ msg: "ok", data: reports });
     return;
   } catch (error) {
     res.status(401).json({ error });

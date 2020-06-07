@@ -1,12 +1,12 @@
 const { query } = require("../database");
 
-const getGroups = async ({ farm_id }) => {
+const getGroups = async ({ farm_id }, res) => {
   try {
     await query(`USE farm_${farm_id}`);
 
     const groups = await query(`SELECT * FROM tag_groups`);
 
-    res.send(200).json({ groups });
+    res.json({ msg: "ok", data: groups });
     return;
   } catch (error) {
     res.status(401).json({ error });

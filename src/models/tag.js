@@ -1,12 +1,12 @@
 const { query } = require("../database");
 
-const getTags = async ({ farm_id }) => {
+const getTags = async ({ farm_id }, res) => {
   try {
     await query(`USE farm_${farm_id}`);
 
     const tags = await query(`SELECT * FROM tags`);
 
-    res.send(200).json({ tags });
+    res.json({ msg: "ok", data: tags });
     return;
   } catch (error) {
     res.status(401).json({ error });

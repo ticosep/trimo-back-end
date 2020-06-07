@@ -1,13 +1,13 @@
 const { query } = require("../database");
 const { getAppCode } = require("../crypto");
 
-const getWorkers = async ({ farm_id }) => {
+const getWorkers = async ({ farm_id }, res) => {
   try {
     await query(`USE farm_${farm_id}`);
 
     const workers = await query(`SELECT * FROM workers`);
 
-    res.send(200).json({ workers });
+    res.json({ msg: "ok", data: workers });
     return;
   } catch (error) {
     res.status(401).json({ error });

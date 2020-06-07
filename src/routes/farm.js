@@ -64,7 +64,7 @@ router.get(
   "/map/:farm_id",
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
-    const id = request.params.farm_id;
+    const farm_id = request.params.farm_id;
     const { farms } = request.user;
 
     const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);

@@ -13,6 +13,7 @@ router.get(
   passport.authenticate(STRATEGYS.USER, { session: false }),
   async (request, res) => {
     const farm_id = request.params.farm_id;
+
     const { can_create_worker, farms } = request.user;
 
     const hasAccessToFarm = farms.some((farm) => +farm === +farm_id);

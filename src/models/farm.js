@@ -82,7 +82,7 @@ const setMapFeatures = async ({ farm_id, map_features }, res) => {
     await query("USE user");
 
     await query(
-      `UPDATE map_features SET map_features = '${map_features}' WHERE id = ${+farm_id}`
+      `UPDATE farms SET map_features = '${map_features}' WHERE id = ${+farm_id}`
     );
 
     res.sendStatus(200);
@@ -97,9 +97,11 @@ const getMapFeatures = async ({ farm_id }, res) => {
   try {
     await query("USE user");
 
-    const features = await query(`SELECT map_features WHERE id = ${farm_id}`);
+    const features = await query(
+      `SELECT map_features FROM farms WHERE id = ${farm_id}`
+    );
 
-    res.status(200).json({ features });
+    res.json({ msg: "ok", data: features });
     return;
   } catch (error) {
     res.status(401).json({ error });
