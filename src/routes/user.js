@@ -32,7 +32,7 @@ router.put(
     }
 
     try {
-      await query(`USE user`);
+      await query(`USE core`);
 
       await query(
         `UPDATE users SET name = '${name}', surname = '${surname}'  WHERE id = ${id}`

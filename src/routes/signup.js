@@ -4,7 +4,7 @@ const { createUser } = require("../models/user");
 const router = express.Router();
 
 // Set the databse conection to use the user DB
-database.query("USE user", (err, result) => {
+database.query("USE core", (err, result) => {
   if (err) throw err;
 });
 

@@ -23,7 +23,7 @@ jwtOptions.secretOrKey = process.env.PASSPORT_KEY;
 // lets create our strategy for web token
 let userStrategy = new JwtStrategy(jwtOptions, async (jwt_payload, next) => {
   if (!jwt_payload.is_worker) {
-    await query("USE user");
+    await query("USE core");
 
     const user = await query(`SELECT *
     FROM users

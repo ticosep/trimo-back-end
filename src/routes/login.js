@@ -35,7 +35,7 @@ router.post("/", async (request, res) => {
     return;
   }
 
-  await query("USE user");
+  await query("USE core");
 
   try {
     getUserByEmail({ email }, (error, result) => {

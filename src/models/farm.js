@@ -79,7 +79,7 @@ const createFarm = async (
 
 const setMapFeatures = async ({ farm_id, map_features }, res) => {
   try {
-    await query("USE user");
+    await query("USE core");
 
     await query(
       `UPDATE farms SET map_features = '${map_features}' WHERE id = ${+farm_id}`
@@ -95,7 +95,7 @@ const setMapFeatures = async ({ farm_id, map_features }, res) => {
 
 const getMapFeatures = async ({ farm_id }, res) => {
   try {
-    await query("USE user");
+    await query("USE core");
 
     const features = await query(
       `SELECT map_features FROM farms WHERE id = ${farm_id}`
