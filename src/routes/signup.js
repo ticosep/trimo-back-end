@@ -15,21 +15,27 @@ router.post("/", (request, res) => {
 
     const isValid = !!name && !!surname && !!email && !!password;
 
-    if (!isValid) res.sendStatus(400);
+    if (!isValid) {
+      res.sendStatus(400);
+      return;
+    }
 
     try {
       const query = createUser({ name, surname, email, password });
 
       query.on("error", (err) => {
-        res.status(401).json({ msg: "Email ja cadastrado!" });
+        res.sendStatus(401);
+        return;
       });
 
       query.on("result", () => res.sendStatus(200));
     } catch (error) {
       res.sendStatus(400);
+      return;
     }
   } catch (error) {
     res.sendStatus(400);
+    return;
   }
 });
 
