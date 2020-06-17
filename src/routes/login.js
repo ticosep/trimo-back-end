@@ -1,8 +1,8 @@
 const express = require("express");
-const { query } = require("../database");
+const { query } = require("../services/database");
 const router = express.Router();
-const { jwtOptions, jwt } = require("../passportAuth");
-const { decodeAppCode } = require("../crypto");
+const { jwtOptions, jwt } = require("../services/passportAuth");
+const { decodeAppCode } = require("../services/crypto");
 
 const handleLogin = async (user, password, res) => {
   if (user.password === password) {

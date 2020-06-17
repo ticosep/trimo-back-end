@@ -1,6 +1,8 @@
-const { database } = require("../database");
+const { database, query } = require("../services/database");
 const express = require("express");
-const { createUser } = require("../models/user");
+const { jwt, jwtOptions } = require("../services/passportAuth");
+const { transporter } = require("../services/email");
+
 const router = express.Router();
 
 // Set the databse conection to use the user DB
@@ -9,30 +11,33 @@ database.query("USE core", (err, result) => {
 });
 
 // Try to create a new user in the database, if email allreay reponse a error code
-router.post("/", (request, res) => {
+router.post("/", async (request, res) => {
+  const { name, surname, email, password } = request.body;
+
+  const isValid = !!name && !!surname && !!email && !!password;
+
+  if (!isValid) {
+    res.sendStatus(400);
+    return;
+  }
+
   try {
-    const { name, surname, email, password } = request.body;
+    const { insertId } = await query(
+      `INSERT INTO users (name, surname, email, password) VALUES ('${name}', '${surname}', '${email}', '${password}')`
+    );
 
-    const isValid = !!name && !!surname && !!email && !!password;
+    const token = jwt.sign({ id: insertId }, jwtOptions.secretOrKey);
 
-    if (!isValid) {
-      res.sendStatus(400);
-      return;
-    }
+    const url = `http://localhost:3030/confirmation/${token}`;
 
-    try {
-      const query = createUser({ name, surname, email, password });
+    transporter.sendMail({
+      to: email,
+      subject: "Trimo - Confirmação de email",
+      html: `Por favor clique no link para desbloquear sua conta e acessar o trimo: <a href="${url}">${url}</a>`,
+    });
 
-      query.on("error", (err) => {
-        res.sendStatus(401);
-        return;
-      });
-
-      query.on("result", () => res.sendStatus(200));
-    } catch (error) {
-      res.sendStatus(400);
-      return;
-    }
+    res.sendStatus(200);
+    return;
   } catch (error) {
     res.sendStatus(400);
     return;

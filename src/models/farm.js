@@ -1,4 +1,4 @@
-const { query } = require("../database");
+const { query } = require("../services/database");
 
 const getNewFarmDatabaseSQL = (farmId, user_name, user_surname, user_id) => {
   return `CREATE DATABASE farm_${farmId};

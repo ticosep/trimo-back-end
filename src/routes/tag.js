@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { passport, STRATEGYS } = require("../passportAuth");
+const { passport, STRATEGYS } = require("../services/passportAuth");
 const { createTag, editTag, deleteTag, getTags } = require("../models/tag");
 
 router.get(

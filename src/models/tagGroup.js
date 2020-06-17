@@ -1,4 +1,4 @@
-const { query } = require("../database");
+const { query } = require("../services/database");
 
 const getGroups = async ({ farm_id }, res) => {
   try {

@@ -10,7 +10,9 @@ const {
   tag,
   reports,
 } = require("./src/routes");
-const { passport } = require("./src/passportAuth");
+
+const { passport, jwt, jwtOptions } = require("./src/services/passportAuth");
+const { query } = require("./src/services/database");
 
 const app = express();
 
@@ -35,6 +37,20 @@ app.use("/tag-group", tagGroup);
 app.use("/tag", tag);
 
 app.use("/reports", reports);
+
+app.get("/confirmation/:token", async (req, res) => {
+  try {
+    const verif = jwt.verify(req.params.token, jwtOptions.secretOrKey);
+
+    await query(`USE core`);
+
+    await query(`UPDATE users SET validated = 1 WHERE id = ${verif.id}`);
+  } catch (e) {
+    res.send("error");
+  }
+
+  return res.redirect("http://localhost:3000/login");
+});
 
 app.listen(3030, function () {
   console.log("Example app listening on port 3030!");

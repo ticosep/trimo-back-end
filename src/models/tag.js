@@ -1,4 +1,4 @@
-const { query } = require("../database");
+const { query } = require("../services/database");
 
 const getTags = async ({ farm_id }, res) => {
   try {

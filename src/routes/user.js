@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { passport, STRATEGYS } = require("../passportAuth");
-const { query } = require("../database");
+const { passport, STRATEGYS } = require("../services/passportAuth");
+const { query } = require("../services/database");
 
 router.get(
   "/",

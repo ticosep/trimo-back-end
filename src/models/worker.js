@@ -1,5 +1,5 @@
-const { query } = require("../database");
-const { getAppCode } = require("../crypto");
+const { query } = require("../services/database");
+const { getAppCode } = require("../services/crypto");
 
 const getWorkers = async ({ farm_id }, res) => {
   try {
