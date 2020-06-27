@@ -2,22 +2,22 @@ const express = require("express");
 const router = express.Router();
 const { passport, STRATEGYS } = require("../services/passportAuth");
 
-const {
-  createFarm,
-  getMapFeatures,
-  setMapFeatures,
-} = require("../models/farm");
+const { createFarm, setMapFeatures } = require("../models/farm");
 const { query } = require("../services/database");
 
 // Create a new farm
 router.post(
   "/create",
   passport.authenticate(STRATEGYS.USER, { session: false }),
-  (request, res) => {
-    const { name, production, user_id, user_name, user_surname } = request.body;
+  async (request, res) => {
+    const { name, production } = request.body;
 
     const isValid =
-      !!name && !!production && !!user_id && !!user_name && !!user_surname;
+      !!name &&
+      !!production &&
+      !!request.user.id &&
+      !!request.user.name &&
+      !!request.user.surname;
 
     if (!isValid) {
       res.sendStatus(400);
@@ -25,7 +25,16 @@ router.post(
     }
 
     try {
-      createFarm({ name, production, user_id, user_name, user_surname }, res);
+      await createFarm(
+        {
+          name,
+          production,
+          user_id: request.user.id,
+          user_name: request.user.name,
+          user_surname: request.user.surname,
+        },
+        res
+      );
       return;
     } catch (error) {
       res.status(404).json({ error });

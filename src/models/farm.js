@@ -69,7 +69,7 @@ const createFarm = async (
 
     await query(SQL);
 
-    res.sendStatus(200);
+    res.status(200).json({ id: insertId });
     return;
   } catch (error) {
     res.status(401).json({ error });
