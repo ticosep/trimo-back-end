@@ -4,7 +4,19 @@ const getTags = async ({ farm_id }, res) => {
   try {
     await query(`USE farm_${farm_id}`);
 
-    const tags = await query(`SELECT * FROM tags`);
+    const tags = await query(`SELECT tag_groups.id, tag_groups.name, 
+    JSON_ARRAYAGG(
+      JSON_OBJECT(
+          'name', tags.name,
+          'id', tags.id,
+          'color', tags.color,
+          'tag_desc', tags.tag_desc,
+          'custom_data', tags.custom_data
+      )) 
+    AS tags_in_group
+    FROM tag_groups
+    JOIN tags ON tags.tag_group_id = tag_groups.id
+    GROUP BY tags.tag_group_id`);
 
     res.json({ msg: "ok", data: tags });
     return;
